@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\FolderController;
+use App\Http\Controllers\ImageController;
 use App\Http\Controllers\ProfileController;
+use App\Models\Folder;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,8 +18,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
-});
+    return view('home', [
+        'sections' => Folder::all()
+    ]);
+})->name('home');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -28,4 +33,29 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
+
+/* -------------------------------- Sections -------------------------------- */
+
+Route::get('/{folder:slug}', [FolderController::class, 'show'])->name('folder.show');
+
+
+Route::post('/folder/{isSection?}', [FolderController::class, 'store'])->name('folder.store');
+Route::delete('/folder', [FolderController::class, 'destroy'])->name('folder.destroy');
+
+Route::get('/{folder:slug}/images/create', [ImageController::class, 'create'])->name('image.create');
+
+Route::post('/images/store', [ImageController::class, 'store'])->name('image.store');
+Route::post('uploads', [ImageController::class, 'uploads'])->name('uploads');
+
+
+
+
+Route::get('/{folder?}', function ($folder = null) {
+    if (!empty($folder)) {
+        $folder_arr = explode('/', $folder);
+        $slug = end($folder_arr);
+        $folder = Folder::where('slug', $slug)->first();
+    }
+    return view('folders.show', ['folder' => $folder, 'ancestors' => $folder->ancestors()]);
+})->where('folder', '.*');
