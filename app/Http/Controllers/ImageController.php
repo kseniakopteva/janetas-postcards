@@ -8,6 +8,17 @@ use Illuminate\Http\Request;
 
 class ImageController extends Controller
 {
+    public function show(Folder $folder, Image $image)
+    {
+        $previous = Image::where('folder_id', '=', $folder->id)->where('created_at', '<', $image->created_at)->orderBy('created_at', 'desc')->first();
+        $next = Image::where('folder_id', '=', $folder->id)->where('created_at', '>', $image->created_at)->orderBy('created_at', 'asc')->first();
+
+        return view('images.show', [
+            'image' => $image,
+            'previous' => $previous,
+            'next' => $next
+        ]);
+    }
     public function create(Folder $folder)
     {
         return view('images.create', [
@@ -17,73 +28,39 @@ class ImageController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request->document);
+        if (!auth()->check())
+            return back()->with('error', 'You can\'t do that.');
 
-        foreach ($request->file('document', []) as $file) {
-
-            $path = storage_path('app\public\images');
-
-
-            $imageName = $file; //strtolower($request->user()->username) . '_' . time() . '.' . $request->image->extension();
-
-            $attributes['image'] = $imageName;
-            $attributes['name'] = $imageName;
-            $attributes['slug'] = $imageName;
-            $attributes['folder_id'] = $request->folder;
-
-            $file->move($path, $imageName);
-
-            \Intervention\Image\Facades\Image::make($path . '\\' . $imageName)->resize(1000, null, function ($constraint) {
-                $constraint->aspectRatio();
-            })->save($path . '\\' . $imageName);
-
-            // return $file;
-        }
-
-
-
-        // $ds          = DIRECTORY_SEPARATOR;  //1
-
-        // $storeFolder = public_path() . 'images';   //2
-
-        // if (!empty($_FILES)) {
-
-        //     $tempFile = $_FILES['file']['tmp_name'];          //3
-
-        //     $targetPath = dirname(__FILE__) . $ds . $storeFolder . $ds;  //4
-        //     dd($targetPath);
-        //     $targetFile =  $targetPath . $_FILES['file']['name'];  //5
-
-        //     $image = Image::create([
-        //         'name' => $_FILES['file']['name'],
-        //         'slug' => strtolower(str_replace(' ', '-', $_FILES['file']['name'])),
-        //         'folder_id' => $request->folder,
-        //     ]);
-
-
-
-        //     move_uploaded_file($tempFile, $targetFile); //6
-
-        redirect()->back();
-    }
-
-    public function uploads(Request $request)
-    {
-        $path = storage_path('tmp/uploads');
-
-        if (!file_exists($path)) {
-            mkdir($path, 0777, true);
-        }
-
-        $file = $request->file('file');
-
-        $name = uniqid() . '_' . trim($file->getClientOriginalName());
-
-        $file->move($path, $name);
-
-        return response()->json([
-            'name'          => $name,
-            'original_name' => $file->getClientOriginalName(),
+        $attributes = $request->validate([
+            'files' => 'required'
         ]);
+
+        $path = storage_path('app\public\images');
+
+        foreach ($request->file('files') as $file) {
+            $orig = pathinfo($file->getClientOriginalName());
+
+            $onlyFileName = str_replace(' ', '', $orig['filename']);
+            $fullFileName = $onlyFileName . '_' . time() . '.' . $orig['extension'];
+            $fileNameNoExt = $onlyFileName;
+            if (Image::whereSlug($onlyFileName)->exists())
+                $fileNameNoExt .= '_' . time();
+            // dd($fullFileName);
+
+            $file->move($path, $fullFileName);
+
+            \Intervention\Image\Facades\Image::make($path . '\\' . $fullFileName)->resize(2000, null, function ($constraint) {
+                $constraint->aspectRatio();
+            })->save($path . '\\' . $fullFileName);
+
+            $image = Image::create([
+                'file' =>  $fullFileName,
+                'slug' => $fileNameNoExt,
+                'folder_id' => $request->folder
+            ]);
+        }
+        $folder = Folder::where('id', $request->folder)->first();
+
+        return redirect()->route('folder.show', ['folder' => $folder])->with('success', 'You have successfully uploaded images!');
     }
 }

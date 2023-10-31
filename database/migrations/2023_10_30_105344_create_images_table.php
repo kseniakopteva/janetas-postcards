@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('images', function (Blueprint $table) {
             $table->id();
+            $table->string('file')->unique();
             $table->string('slug')->unique();
-            $table->string('name');
             $table->foreignId('folder_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });

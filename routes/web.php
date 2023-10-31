@@ -43,12 +43,11 @@ Route::get('/{folder:slug}', [FolderController::class, 'show'])->name('folder.sh
 Route::post('/folder/{isSection?}', [FolderController::class, 'store'])->name('folder.store');
 Route::delete('/folder', [FolderController::class, 'destroy'])->name('folder.destroy');
 
-Route::get('/{folder:slug}/images/create', [ImageController::class, 'create'])->name('image.create');
+// Route::get('/{folder:slug}/images/create', [ImageController::class, 'create'])->name('image.create');
 
 Route::post('/images/store', [ImageController::class, 'store'])->name('image.store');
-Route::post('uploads', [ImageController::class, 'uploads'])->name('uploads');
 
-
+Route::get('/{folder:slug}/images/{image:slug}', [ImageController::class, 'show'])->name('image.show');
 
 
 Route::get('/{folder?}', function ($folder = null) {

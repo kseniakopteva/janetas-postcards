@@ -17,6 +17,9 @@ class FolderController extends Controller
 
     public function store(Request $request, $isSection = null)
     {
+        if (!auth()->check())
+            return back()->with('error', 'You can\'t do that.');
+
         if ($isSection) $name = 'section_name';
         else $name = 'folder_name';
 
@@ -25,7 +28,7 @@ class FolderController extends Controller
         ]);
         $attributes['slug'] = strtolower(str_replace(' ', '-', $attributes[$name]));
         if ($request['parent']) {
-            $attributes['folder_id'] = $request['parent'];
+            $attributes['parent_id'] = $request['parent'];
         }
         $attributes['name'] = $attributes[$name];
         unset($attributes[$name]);
