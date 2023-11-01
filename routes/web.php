@@ -19,13 +19,13 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('home', [
-        'sections' => Folder::all()
+        'folders' => Folder::where('parent_id', null)->orderBy('created_at', 'desc')->get()
     ]);
 })->name('home');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// Route::get('/dashboard', function () {
+//     return view('dashboard');
+// })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -49,6 +49,11 @@ Route::post('/images/store', [ImageController::class, 'store'])->name('image.sto
 
 Route::get('/{folder:slug}/images/{image:slug}', [ImageController::class, 'show'])->name('image.show');
 
+Route::delete('/image/destroy', [ImageController::class, 'destroy'])->name('image.destroy');
+Route::delete('/images/destroy', [ImageController::class, 'mass_destroy'])->name('images.destroy');
+Route::delete('/destroy', [ImageController::class, 'mass_destroy_images'])->name('images.mass.destroy');
+
+Route::post('/image/update', [ImageController::class, 'update'])->name('image.update');
 
 Route::get('/{folder?}', function ($folder = null) {
     if (!empty($folder)) {

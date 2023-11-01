@@ -34,28 +34,8 @@ class DatabaseSeeder extends Seeder
             [
                 'id' => 4,
                 'name' => 'Cats',
-                'parent_id' => null,
+                'parent_id' => 1,
             ],
-            [
-                'id' => 5,
-                'name' => 'Cat Illustrations',
-                'parent_id' => 4,
-            ],
-            [
-                'id' => 6,
-                'name' => 'Cat Photos 1',
-                'parent_id' => 5,
-            ],
-            [
-                'id' => 7,
-                'name' => 'Cat Photos 2',
-                'parent_id' => 6,
-            ],
-            [
-                'id' => 8,
-                'name' => 'Cat Photos 3',
-                'parent_id' => 7,
-            ]
         ];
 
         foreach ($folders as $f) {
@@ -64,30 +44,6 @@ class DatabaseSeeder extends Seeder
                 'name' => $f['name'],
                 'slug' => strtolower(str_replace(' ', '-', $f['name'])),
                 'parent_id' => $f['parent_id'],
-            ]);
-        }
-
-        $images = [
-            [
-                'file' => '1.jpg',
-                'slug' => 1,
-                'folder_id' => 8
-            ], [
-                'file' => '2.jpg',
-                'slug' => 2,
-                'folder_id' => 8
-            ], [
-                'file' => '3.jpg',
-                'slug' => 3,
-                'folder_id' => 8
-            ],
-        ];
-
-        foreach ($images as $i) {
-            Image::factory()->create([
-                'file' => $i['file'],
-                'slug' => $i['slug'],
-                'folder_id' => $i['folder_id'],
             ]);
         }
     }

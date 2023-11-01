@@ -1,3 +1,36 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+[x-cloak] {
+    display: none !important;
+}
+
+input[type=file]::file-selector-button {
+    /* display: none; */
+    margin-right: 1rem;
+    padding: 0.5rem 1rem;
+    border: none;
+    background-color: #ddbad2;
+    border-radius: 0.25rem;
+    cursor: pointer;
+}
+
+.folder {
+    background-color: #C4A6C1;
+    margin-top: 1.5rem;
+    height: calc(100% - 1.5rem);
+    position: relative;
+    border-radius: 0 0.375rem 0.375rem 0.375rem;
+}
+
+.folder:before {
+    content: '';
+    height: 1.6rem;
+    position: absolute;
+    top: -1.5rem;
+    background-color: #C4A6C1;
+    width: 50%;
+    left: 0;
+    border-radius: 0.375rem 1.5rem 0 0;
+}

@@ -34,7 +34,7 @@ class FolderController extends Controller
         unset($attributes[$name]);
 
         $folder = Folder::create($attributes);
-        return redirect((url()->previous()) . '/' . $folder->slug);
+        return redirect((url()->previous())); // . '/' . $folder->slug);
     }
 
     public function destroy(Request $request)
