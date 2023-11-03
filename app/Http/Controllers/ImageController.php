@@ -10,8 +10,8 @@ class ImageController extends Controller
 {
     public function show(Folder $folder, Image $image)
     {
-        $previous = Image::where('folder_id', '=', $folder->id)->where('created_at', '<', $image->created_at)->orderBy('created_at', 'desc')->first();
-        $next = Image::where('folder_id', '=', $folder->id)->where('created_at', '>', $image->created_at)->orderBy('created_at', 'asc')->first();
+        $previous = Image::where('folder_id', '=', $folder->id)->where('id', '<', $image->id)->orderBy('id', 'desc')->first();
+        $next = Image::where('folder_id', '=', $folder->id)->where('id', '>', $image->id)->orderBy('id', 'asc')->first();
 
         $i = Image::where('folder_id', '=', $folder->id)->where('slug', '=', $image->slug)->first();
 
@@ -70,7 +70,7 @@ class ImageController extends Controller
         $array = explode('/', url()->previous());
         $url = implode('/', array_slice($array, 0, count($array) - 1)) . '/' . $new_slug;
 
-        return redirect($url)->with('success', 'You have successfully rename the image!');
+        return redirect($url)->with('success', 'You have successfully renamed the image!');
     }
 
     public function store(Request $request)
@@ -101,12 +101,13 @@ class ImageController extends Controller
 
             $file->move($path, $fullFileName);
 
-            \Intervention\Image\Facades\Image::make($path . '\\' . $fullFileName)->resize(2000, null, function ($constraint) {
+            \Intervention\Image\Facades\Image::make($path . '\\' . $fullFileName)->resize(1920, null, function ($constraint) {
                 $constraint->aspectRatio();
+                $constraint->upsize();
             })->save($path . '\\' . $fullFileName);
 
             $image = Image::create([
-                'name' => $onlyFileName,
+                'name' => $orig['filename'],
                 'slug' => preg_replace('/[^A-Za-z0-9\-]/', '', $fileNameNoExt),
                 'file' =>  $fullFileName,
                 'folder_id' => $request->folder

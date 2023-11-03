@@ -22,12 +22,14 @@
 
                     <x-slot name="content">
                         <x-dropdown-link class="cursor-pointer" x-data=""
-                            x-on:click.prevent="$dispatch('open-modal', 'add-images')">Add
+                            x-on:click.prevent="$dispatch('open-modal', 'add-images'); document.getElementById('addImagesForm').reset()">Add
                             Images</x-dropdown-link>
                         <x-dropdown-link class="cursor-pointer" x-data=""
                             x-on:click.prevent="$dispatch('open-modal', 'new-folder')">
                             Add Folder
                         </x-dropdown-link>
+                        <x-dropdown-link class="cursor-pointer" x-data=""
+                            x-on:click.prevent="$dispatch('open-modal', 'rename-folder')">Rename Folder</x-dropdown-link>
 
                         <form action="{{ route('images.destroy') }}" method="POST">
                             @csrf @method('delete')
@@ -53,10 +55,16 @@
     </div>
     <form action="{{ route('images.mass.destroy') }}" method="POST" class="relative" enctype="multipart/form-data">
         <input type="hidden" name="folder" value="{{ $folder->id }}">
-        @csrf @method('delete')@if ($edit)
-            <div class="flex space-x-4 absolute -top-12 right-0">
+        @csrf @method('delete')
+        @if ($edit)
+            <div class="flex space-x-4 absolute -top-12 right-0 items-center">
+                {{-- <button type="button" onClick="toggle(this)">Select all</button> --}}
+                <input type="checkbox" id="all" onClick="toggle(this)" class="hidden" />
+                <label for="all" style="user-select: none" class="hover:text-rose-600 cursor-pointer">Select
+                    all</label>
+
                 <a href="{{ route('folder.show', ['folder' => $folder]) }}"
-                    class="inline-flex items-center px-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-500 rounded-md font-semibold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-widest shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-25 transition ease-in-out duration-150">Cancel</a>
+                    class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-500 rounded-md font-semibold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-widest shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-25 transition ease-in-out duration-150">Cancel</a>
                 <x-danger-button onclick="return confirm('Are you sure you want to delete these images?')">Delete
                     images</x-danger-button>
             </div>
@@ -97,8 +105,24 @@
         } else {
             $show_images_modal = false;
         }
+
+        if ($errors->getBag('default')->has('new_folder_name')) {
+            $show_rename_folder_modal = true;
+        } else {
+            $show_rename_folder_modal = false;
+        }
     @endphp
 
     <x-new-folder-modal :show="$show_folder_modal" :folder="$folder" />
     <x-new-images-modal :show="$show_images_modal" :folder="$folder" />
+    <x-rename-folder-modal :show="$show_rename_folder_modal" :folder="$folder" />
+
+    <script>
+        function toggle(source) {
+            checkboxes = document.getElementsByName('images[]');
+            for (var i = 0, n = checkboxes.length; i < n; i++) {
+                checkboxes[i].checked = source.checked;
+            }
+        }
+    </script>
 </x-main-layout>

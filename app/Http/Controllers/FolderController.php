@@ -37,6 +37,37 @@ class FolderController extends Controller
         return redirect((url()->previous())); // . '/' . $folder->slug);
     }
 
+    public function update(Request $request)
+    {
+        $attributes = $request->validate([
+            'new_folder_name' => 'required|max:255'
+        ]);
+        $folder = Folder::find($request->folder);
+
+        $new = $attributes['new_folder_name'];
+        $new_slug = preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $new));
+
+        if (!is_null($folder->parent))
+            if (Folder::whereSlug($new_slug)->where('folder_id', '=', $folder->parent->id)->exists())
+                $new_slug .= '_' . time();
+            elseif (Folder::whereSlug($new_slug)->where('parent_id', null)->exists())
+                $new_slug .= '_' . time();
+
+        if (is_null($new_slug) || !isset($new_slug) || $new_slug == '') {
+            $new_slug = time();
+        }
+
+        Folder::where('id', $request->folder)->update([
+            'name' => $new,
+            'slug' => $new_slug,
+        ]);
+
+        $array = explode('/', url()->previous());
+        $url = implode('/', array_slice($array, 0, count($array) - 1)) . '/' . $new_slug;
+
+        return redirect($url)->with('success', 'You have successfully renamed the folder!');
+    }
+
     public function destroy(Request $request)
     {
         $folder = Folder::find($request->id);

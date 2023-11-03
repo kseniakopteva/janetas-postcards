@@ -16,7 +16,7 @@
         <div class="mt-6">
             <x-input-label for="folder_name" value="{{ __('name') }}" class="sr-only" />
 
-            <x-text-input id="name" name="folder_name" type="text" class="mt-1 block w-3/4"
+            <x-text-input id="folder_name" name="folder_name" type="text" class="mt-1 block w-3/4"
                 placeholder="{{ __('Name') }}" value="{{ old('folder_name') }}" />
 
             <x-input-error :messages="$errors->get('folder_name')" class="mt-2" />
@@ -28,7 +28,7 @@
             </x-secondary-button>
 
             <x-primary-button class="ml-3">
-                {{ __('Create new folder') }}
+                {{ __('Create') }}
             </x-primary-button>
         </div>
     </form>

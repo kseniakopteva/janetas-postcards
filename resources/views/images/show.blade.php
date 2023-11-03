@@ -1,5 +1,3 @@
-{{-- @props(['previous']) --}}
-
 <x-main-layout :min="true" class="w-full mx-auto">
     <div class="max-w-7xl">
         <x-breadcrumbs :folder="$image->folder" :active="true" />
@@ -7,8 +5,8 @@
     <div class="grid grid-cols-12 bg-gray-100 py-6">
         <a class="text-6xl flex justify-start items-center h-full col-span-2 w-full px-3"
             @if (!is_null($next)) href="{{ route('image.show', ['folder' => $image->folder->slug, 'image' => $next->slug]) }}" @endif>
-            <svg xmlns="http://www.w3.org/2000/svg" height="1em"
-                @if (is_null($next)) style="fill: rgb(156 163 175)" @endif
+            <svg xmlns="http://www.w3.org/2000/svg" height="0.6em"
+                @if (is_null($next)) style="fill: rgb(156 163 175)" @else style="fill: rgb(92,57,81)" @endif
                 viewBox="0 0 320 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. -->
                 <path
                     d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z" />
@@ -17,23 +15,14 @@
 
         <div x-data="container" class="col-span-8 mx-auto h-[calc(100vh-20.2rem)]">
             <img class="h-full object-contain" src="{{ asset('storage/images/' . $image->file) }}" alt=""
-                {{-- @if (!is_null($slide)) x-transition:enter="transition-transform transition-opacity ease-out duration-300"
-                x-transition:leave="transition ease-in duration-300"
-                @if ($slide === 'left') x-transition:enter-start="opacity-0 transform translate-x-2"
-                x-transition:enter-end="opacity-100 transform translate-y-0"
-                x-transition:leave-end="opacity-0 transform -translate-x-2"
-                @else
-                x-transition:enter-start="opacity-0 transform -translate-x-2"
-                x-transition:enter-end="opacity-100 transform translate-y-0"
-                x-transition:leave-end="opacity-0 transform translate-x-2" @endif
-                x-show="show" x-init="$nextTick(() => show = true)"@endif x-cloak --}}>
+                style="filter: drop-shadow(0 4px 3px rgb(0 0 0 / 0.07)) drop-shadow(0 2px 2px rgb(0 0 0 / 0.06));">
         </div>
 
         <a class="text-6xl flex justify-end items-center h-full col-span-2 w-full px-3"
             @if (!is_null($previous)) href="{{ route('image.show', ['folder' => $image->folder->slug, 'image' => $previous->slug]) }}" @endif>
             {{-- <i class="fa-solid first-letter:fa-chevron-right"></i> --}}
-            <svg xmlns="http://www.w3.org/2000/svg" height="1em"
-                @if (is_null($previous)) style="fill: rgb(156 163 175)" @endif
+            <svg xmlns="http://www.w3.org/2000/svg" height="0.6em"
+                @if (is_null($previous)) style="fill: rgb(156 163 175)" @else style="fill: rgb(92,57,81)" @endif
                 viewBox="0 0 320 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. -->
 
                 <path
@@ -115,5 +104,32 @@
             </div>
         </form>
     </x-modal>
+
+    <script>
+        document.onkeydown = checkKey;
+
+        function checkKey(e) {
+
+            e = e || window.event;
+
+            if (e.keyCode == '38') {
+                console.log('up');
+            } else if (e.keyCode == '40') {
+                console.log('down');
+            } else if (e.keyCode == '37') {
+                console.log('left');
+                @if (!is_null($next))
+                    window.location.href =
+                        "{{ route('image.show', ['folder' => $image->folder->slug, 'image' => $next->slug]) }}";
+                @endif
+            } else if (e.keyCode == '39') {
+                console.log('right');
+                @if (!is_null($previous))
+                    window.location.href =
+                        "{{ route('image.show', ['folder' => $image->folder->slug, 'image' => $previous->slug]) }}";
+                @endif
+            }
+        }
+    </script>
 
 </x-main-layout>

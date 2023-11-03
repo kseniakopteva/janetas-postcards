@@ -2,10 +2,11 @@
     <nav x-data="{ open: false }" class="flex flex-col md:flex-row justify-between items-center max-w-5xl mx-auto">
 
 
-        <div class="md:flex-row gap-4 hidden md:flex">
-            <div><x-nav-link href="{{ route('home') }}" :active="request()->routeIs('home')">Home</x-nav-link><span
-                    class="text-gray-500 pl-2 hidden md:inline">
-                    | </span></div>
+        <div class="md:flex-row gap-4 hidden md:flex pb-2 pl-2 xl:pl-0">
+            <div>
+                <x-nav-link href="{{ route('home') }}" :active="request()->routeIs('home')">Home</x-nav-link>
+                <span class="text-gray-500 pl-2 hidden md:inline">|</span>
+            </div>
             <div class="flex flex-col md:flex-row gap-4">
                 @foreach ($folders as $folder)
                     <x-nav-link href="{{ route('folder.show', $folder->slug) }}" :active="(request()->route('folder')->slug ?? null) == $folder->slug">
@@ -30,13 +31,12 @@
                 </button>
             </div>
 
-            @if (!auth()->check())
+            @if (!auth()->check() && !$min && request()->routeIs('home'))
                 <a href="{{ route('login') }}"
-                    class="font-semibold text-rose-600 hover:text-rose-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-rose-500">Log
+                    class="pr-2 xl:pr-0 -mt-2 font-semibold text-rose-300 hover:text-rose-500 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-rose-500">Log
                     in</a>
             @endif
         </div>
-
 
         @if ($errors->getBag('default')->has('section_name'))
             <?php $show = true; ?>

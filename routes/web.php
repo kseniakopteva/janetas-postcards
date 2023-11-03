@@ -4,6 +4,7 @@ use App\Http\Controllers\FolderController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\ProfileController;
 use App\Models\Folder;
+use App\Models\Image;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,7 +20,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('home', [
-        'folders' => Folder::where('parent_id', null)->orderBy('created_at', 'desc')->get()
+        'folders' => Folder::where('parent_id', null)->orderBy('created_at', 'desc')->get(),
+        'recent_images' => Image::latest()->take(8)->get(),
     ]);
 })->name('home');
 
@@ -31,6 +33,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::delete('/remove', [ProfileController::class, 'remove_image'])->name('remove_image');
 });
 
 require __DIR__ . '/auth.php';
@@ -43,8 +46,6 @@ Route::get('/{folder:slug}', [FolderController::class, 'show'])->name('folder.sh
 Route::post('/folder/{isSection?}', [FolderController::class, 'store'])->name('folder.store');
 Route::delete('/folder', [FolderController::class, 'destroy'])->name('folder.destroy');
 
-// Route::get('/{folder:slug}/images/create', [ImageController::class, 'create'])->name('image.create');
-
 Route::post('/images/store', [ImageController::class, 'store'])->name('image.store');
 
 Route::get('/{folder:slug}/images/{image:slug}', [ImageController::class, 'show'])->name('image.show');
@@ -54,6 +55,7 @@ Route::delete('/images/destroy', [ImageController::class, 'mass_destroy'])->name
 Route::delete('/destroy', [ImageController::class, 'mass_destroy_images'])->name('images.mass.destroy');
 
 Route::post('/image/update', [ImageController::class, 'update'])->name('image.update');
+Route::patch('/folder/update', [FolderController::class, 'update'])->name('folder.update');
 
 Route::get('/{folder?}', function ($folder = null) {
     if (!empty($folder)) {

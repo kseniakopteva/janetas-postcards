@@ -4,17 +4,17 @@
         @method('post')
 
         <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
-            {{ __('New Section') }}
+            {{ __('New Collection') }}
         </h2>
 
         <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            {{ __('Here you can create a new section.') }}
+            {{ __('Here you can create a new collection.') }}
         </p>
 
         <div class="mt-6">
             <x-input-label for="section_name" value="{{ __('name') }}" class="sr-only" />
 
-            <x-text-input id="name" name="section_name" type="text" class="mt-1 block w-3/4"
+            <x-text-input id="section_name" name="section_name" type="text" class="mt-1 block w-3/4"
                 placeholder="{{ __('Name') }}" value="{{ old('section_name') }}" />
 
             <x-input-error :messages="$errors->get('section_name')" class="mt-2" />
@@ -26,7 +26,7 @@
             </x-secondary-button>
 
             <x-primary-button class="ml-3">
-                {{ __('Create new section') }}
+                {{ __('Create') }}
             </x-primary-button>
         </div>
     </form>
